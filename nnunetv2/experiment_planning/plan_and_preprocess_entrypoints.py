@@ -1,4 +1,4 @@
-from configuration import default_num_processes
+from nnunetv2.configuration import default_num_processes
 from nnunetv2.experiment_planning.plan_and_preprocess_api import extract_fingerprints, plan_experiments, preprocess
 
 
