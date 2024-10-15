@@ -1,4 +1,5 @@
 import warnings
+import shutil
 from typing import List, Type, Optional, Tuple, Union
 
 from batchgenerators.utilities.file_and_folder_operations import join, maybe_mkdir_p, load_json
@@ -136,10 +137,22 @@ def preprocess_dataset(dataset_id: int,
     dataset = get_filenames_of_train_images_and_targets(join(nnUNet_raw, dataset_name), dataset_json)
     # only copy files that are newer than the ones already present
     for k in dataset:
-        copy_file(dataset[k]['label'],
-                  join(nnUNet_preprocessed, dataset_name, 'gt_segmentations', k + dataset_json['file_ending']),
-                  update=True)
+        #This did not work on the cluster, so I commented it out and tried the following line
+        # copy_file(dataset[k]['label'],
+        #           join(nnUNet_preprocessed, dataset_name, 'gt_segmentations', k + dataset_json['file_ending']),
+        #           update=True)
+        src = dataset[k]['label']  # The source file path
+        dst = join(nnUNet_preprocessed, dataset_name, 'gt_segmentations', k + dataset_json['file_ending'])  # The destination path
 
+        try:
+            shutil.copyfile(src, dst)  # Attempt to copy the file
+            print(f"Copied {src} to {dst}")  # Success message
+        except PermissionError as e:
+            print(f"PermissionError while copying {src} to {dst}: {e}")  # Handle permission errors
+        except FileNotFoundError as e:
+            print(f"FileNotFoundError: {src} does not exist: {e}")  # Handle missing files
+        except Exception as e:
+            print(f"Unexpected error: {e}")  # Catch any other exceptions
 
 def preprocess(dataset_ids: List[int],
                plans_identifier: str = 'nnUNetPlans',
