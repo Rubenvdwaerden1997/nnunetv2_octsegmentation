@@ -8,6 +8,7 @@ __pycache__/
 
 # Manual exclusion of folders and files
 Data/
+Predictions/
 
 # Distribution / packaging
 .Python
