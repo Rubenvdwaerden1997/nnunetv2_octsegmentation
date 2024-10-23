@@ -247,6 +247,7 @@ class nnUNetPredictor(object):
                                                 output_folder_or_list_of_truncated_output_files,
                                                 folder_with_segs_from_prev_stage, overwrite, part_id, num_parts,
                                                 save_probabilities)
+
         if len(list_of_lists_or_source_folder) == 0:
             return
 
@@ -858,11 +859,15 @@ def predict_entry_point():
                                 verbose=args.verbose,
                                 verbose_preprocessing=args.verbose,
                                 allow_tqdm=not args.disable_progress_bar)
+    
+    print(f'Initializing from model folder {model_folder}')
+    
     predictor.initialize_from_trained_model_folder(
         model_folder,
         args.f,
         checkpoint_name=args.chk
     )
+    
     predictor.predict_from_files(args.i, args.o, save_probabilities=args.save_probabilities,
                                  overwrite=not args.continue_prediction,
                                  num_processes_preprocessing=args.npp,
