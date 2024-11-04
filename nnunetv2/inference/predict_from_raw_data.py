@@ -5,6 +5,8 @@ import os
 from copy import deepcopy
 from time import sleep
 from typing import Tuple, Union, List, Optional
+import time
+import pandas as pd
 
 import numpy as np
 import torch
@@ -255,8 +257,8 @@ class nnUNetPredictor(object):
                                                                                  seg_from_prev_stage_files,
                                                                                  output_filename_truncated,
                                                                                  num_processes_preprocessing)
-
-        return self.predict_from_data_iterator(data_iterator, save_probabilities, num_processes_segmentation_export)
+        result, total_prediction_times = self.predict_from_data_iterator(data_iterator, save_probabilities, num_processes_segmentation_export)
+        return result, total_prediction_times
 
     def _internal_get_data_iterator_from_lists_of_filenames(self,
                                                             input_list_of_lists: List[List[str]],
@@ -349,6 +351,7 @@ class nnUNetPredictor(object):
         with multiprocessing.get_context("spawn").Pool(num_processes_segmentation_export) as export_pool:
             worker_list = [i for i in export_pool._pool]
             r = []
+            total_prediction_times = {}
             for preprocessed in data_iterator:
                 data = preprocessed['data']
                 if isinstance(data, str):
@@ -373,8 +376,12 @@ class nnUNetPredictor(object):
                     sleep(0.1)
                     proceed = not check_workers_alive_and_busy(export_pool, worker_list, r, allowed_num_queued=2)
 
-                prediction = self.predict_logits_from_preprocessed_data(data).cpu()
-
+                prediction, prediction_time = self.predict_logits_from_preprocessed_data(data)
+                prediction=prediction.cpu()
+                
+                if ofile is not None:
+                    total_prediction_times[os.path.basename(ofile)] = prediction_time
+                
                 if ofile is not None:
                     # this needs to go into background processes
                     # export_prediction_from_logits(prediction, properties, self.configuration_manager, self.plans_manager,
@@ -417,7 +424,7 @@ class nnUNetPredictor(object):
         compute_gaussian.cache_clear()
         # clear device cache
         empty_cache(self.device)
-        return ret
+        return ret, total_prediction_times
 
     def predict_single_npy_array(self, input_image: np.ndarray, image_properties: dict,
                                  segmentation_previous_stage: np.ndarray = None,
@@ -446,7 +453,7 @@ class nnUNetPredictor(object):
 
         if self.verbose:
             print('predicting')
-        predicted_logits = self.predict_logits_from_preprocessed_data(dct['data']).cpu()
+        predicted_logits, prediction_time = self.predict_logits_from_preprocessed_data(dct['data']).cpu()
 
         if self.verbose:
             print('resampling to original shape')
@@ -477,7 +484,7 @@ class nnUNetPredictor(object):
         n_threads = torch.get_num_threads()
         torch.set_num_threads(default_num_processes if default_num_processes < n_threads else n_threads)
         prediction = None
-
+        prediction_time = 0
         for params in self.list_of_parameters:
 
             # messing with state dict names...
@@ -489,17 +496,19 @@ class nnUNetPredictor(object):
             # why not leave prediction on device if perform_everything_on_device? Because this may cause the
             # second iteration to crash due to OOM. Grabbing that with try except cause way more bloated code than
             # this actually saves computation time
+            time_start_prediction = time.time()
             if prediction is None:
                 prediction = self.predict_sliding_window_return_logits(data).to('cpu')
             else:
                 prediction += self.predict_sliding_window_return_logits(data).to('cpu')
-
+            prediction_time += time.time() - time_start_prediction
         if len(self.list_of_parameters) > 1:
             prediction /= len(self.list_of_parameters)
 
         if self.verbose: print('Prediction done')
         torch.set_num_threads(n_threads)
-        return prediction
+
+        return prediction, prediction_time
 
     def _internal_get_sliding_window_slicers(self, image_size: Tuple[int, ...]):
         slicers = []
@@ -746,7 +755,7 @@ def predict_entry_point_modelfolder():
                                 allow_tqdm=not args.disable_progress_bar,
                                 verbose_preprocessing=args.verbose)
     predictor.initialize_from_trained_model_folder(args.m, args.f, args.chk)
-    predictor.predict_from_files(args.i, args.o, save_probabilities=args.save_probabilities,
+    results, total_prediction_times = predictor.predict_from_files(args.i, args.o, save_probabilities=args.save_probabilities,
                                  overwrite=not args.continue_prediction,
                                  num_processes_preprocessing=args.npp,
                                  num_processes_segmentation_export=args.nps,
@@ -861,20 +870,41 @@ def predict_entry_point():
                                 allow_tqdm=not args.disable_progress_bar)
     
     print(f'Initializing from model folder {model_folder}')
-    
+    start_initializetime = time.time()
     predictor.initialize_from_trained_model_folder(
         model_folder,
         args.f,
         checkpoint_name=args.chk
     )
-    
-    predictor.predict_from_files(args.i, args.o, save_probabilities=args.save_probabilities,
+    end_initializetime = time.time()
+    initialization_time = end_initializetime - start_initializetime
+
+    results, total_prediction_times = predictor.predict_from_files(args.i, args.o, save_probabilities=args.save_probabilities,
                                  overwrite=not args.continue_prediction,
                                  num_processes_preprocessing=args.npp,
                                  num_processes_segmentation_export=args.nps,
                                  folder_with_segs_from_prev_stage=args.prev_stage_predictions,
                                  num_parts=args.num_parts,
                                  part_id=args.part_id)
+
+    # Convert the dictionary to a DataFrame
+    file_names = list(total_prediction_times.keys())
+    prediction_times = list(total_prediction_times.values())
+    # Create a list for the initialization times
+    initialization_times = [initialization_time] + [None] * (len(file_names) - 1)
+
+    # Convert to a DataFrame
+    data = {
+        'File Name': file_names,
+        'Prediction Time': prediction_times,
+        'Initialization Time': initialization_times  # Add initialization times as a new column
+    }
+    df = pd.DataFrame(data)
+
+    # Save the DataFrame to an Excel file
+    df.to_excel(join(args.o, 'Prediction_times.xlsx'), index=False)
+
+    print(f'Prediction times saved to {args.o}')
     # r = predict_from_raw_data(args.i,
     #                           args.o,
     #                           model_folder,

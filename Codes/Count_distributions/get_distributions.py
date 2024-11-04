@@ -8,7 +8,7 @@ import os
 import sys
 import argparse
 import cv2
-sys.path.insert(1, '/data/diag/rubenvdw/nnunetv2/nnUNet/Codes/utils')
+sys.path.insert(1, '/data/diag/rubenvdw/nnunetv2/nnUNet/nnunetv2/Codes/utils')
 from postprocessing import create_annotations_lipid, create_annotations_calcium, intima_cap_area_v2
 
 class Get_Distributions:
@@ -42,13 +42,20 @@ class Get_Distributions:
 
         #Obtain format of pullback name (it's different than in the dataset counting)
         filename = file.split('_')[0]
-        first_part = filename[:3]
-        second_part = filename[3:-4]
-        third_part = filename[-4:]
-        patient_name = '{}-{}-{}'.format(first_part, second_part, third_part)
+        n_pullback = file.split('_')[1]
+        if filename.startswith('NLRUMC'):
+            first_part = filename[:2]
+            second_part = filename[2:-5]
+            third_part = filename[-5:]
+            patient_name = '{}-{}-{}'.format(first_part, second_part, third_part)            
+        else:
+            first_part = filename[:3]
+            second_part = filename[3:-4]
+            third_part = filename[-4:]
+            patient_name = '{}-{}-{}'.format(first_part, second_part, third_part)
 
         #Obtain pullback name
-        n_pullback = file.split('_')[1]
+        
         pullback_name = self.data_info[(self.data_info['Nº pullback'] == int(n_pullback)) & (self.data_info['Patient'] == patient_name)]['Pullback'].values[0]
 
         return pullback_name
@@ -74,21 +81,21 @@ class Get_Distributions:
         elif self.num_classes==10:
             counts_per_frame = pd.DataFrame(columns = ['Pullback', 'Frame', 'AI_background', 'AI_lumen', 'AI_guidewire', 'AI_intima', 'AI_lipid', 'AI_calcium',                                    
                                                        'AI_media', 'AI_plaque_rupture', 'AI_sidebranch', 'AI_thrombus', 'AI_lipid_arc', 'AI_FCT', 'AI_calcium_depth', 'AI_calcium_arc', 'AI_calcium_thickness','Manual_FC_Area','AI_FC_Area'])
+        elif self.num_classes==14:
+            counts_per_frame = pd.DataFrame(columns = ['Pullback', 'Frame',  'AI_background', 'AI_lumen', 'AI_guidewire', 'AI_intima', 'AI_lipid', 'AI_calcium', 
+                                                        'AI_media', 'AI_catheter', 'AI_sidebranch', 'AI_rthrombus', 'AI_wthrombus', 'AI_plaque_rupture','AI_layered','AI_microvessel',
+                                                         'AI_lipid_arc', 'AI_FCT', 'AI_calcium_depth', 'AI_calcium_arc', 'AI_calcium_thickness','Manual_FC_Area','AI_FC_Area'])
 
         for file in os.listdir(self.data_path):
-
             #Check only nifti files
             if file.endswith('nii.gz') or file.endswith('nii'):
-
+                print('Counting {} ...'.format(file))
                 pullback_name = self.get_patient_data(file)
                 n_frame = file.split('_')[2][5:]
                 n_frame=int(n_frame)
-                print('Counting {} ...'.format(file))
-
+                
                 seg_map = sitk.ReadImage(os.path.join(self.data_path, file))
                 seg_map_data = sitk.GetArrayFromImage(seg_map)[0]
-
-
 
                 #Get count of labels in each frame
                 one_hot = np.zeros(self.num_classes)
@@ -156,17 +163,18 @@ class Get_Distributions:
 
     
 def main(argv):
-
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data_path', type=str, default=r'Z:\rubenvdw\nnunetv2\nnUNet\nnunetv2\Predictions\Dataset905_SegmentOCT3d3\Predicted_files')
-    parser.add_argument('--output_filename', type=str, default=r'Z:\rubenvdw\nnunetv2\nnUNet\nnunetv2\Predictions\Dataset905_SegmentOCT3d3\Metrics')
-    parser.add_argument('--data_info', type=str, default=r'Z:\rubenvdw\Info_files_Dataset_split\15_classes_dataset_split_extraframes_13062024')
-    parser.add_argument('--num_classes', type=int, default=15)
+    parser.add_argument('--data_path', type=str, default=r'Z:\rubenvdw\nnunetv2\nnUNet\nnunetv2\Data\nnUNet_raw\Dataset701_TS3D3\labelsTr')
+    parser.add_argument('--output_filename', type=str, default=r'Z:\rubenvdw\nnunetv2\nnUNet\nnunetv2\Predictions\Dataset_dummy\Metrics\Dummy_results')
+    parser.add_argument('--data_info', type=str, default=r'Z:\rubenvdw\Info_files_Dataset_split\15_classes_dataset_split_extraframes_25102024')
+    parser.add_argument('--num_classes', type=int, default=14)
     parser.add_argument('--lipid_cap_area_manual', type=int, default=0)
-    parser.add_argument('--task_name', type=str, default=r'Dataset905_SegmentOCT3d3')
+    parser.add_argument('--task_name', type=str, default=r'Dataset_dummy')
     args, _ = parser.parse_known_args(argv)
 
     args = parser.parse_args()
+
+    os.makedirs(os.path.dirname(args.output_filename), exist_ok=True)
 
     counts = Get_Distributions(args.data_path, args.output_filename, args.data_info,args.num_classes,args.lipid_cap_area_manual,args.task_name)
     counts.get_counts()

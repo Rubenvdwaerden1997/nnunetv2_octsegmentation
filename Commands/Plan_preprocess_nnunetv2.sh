@@ -1,8 +1,8 @@
 #! /bin/bash
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=16
+#SBATCH --cpus-per-task=20
 #SBATCH --gpus-per-task=1
-#SBATCH --mem=80G
+#SBATCH --mem=40G
 #SBATCH --time=168:00:00
 #SBATCH --no-container-entrypoint
 #SBATCH --container-mounts=/data/diag:/data/diag,/data/diag/rubenvdw/nnunetv2/nnUNet/nnunetv2/Data:/home/user/Data
@@ -10,6 +10,7 @@
 #SBATCH --qos=high
 #SBATCH -o ./Slurm/_slurm_output_plan_%j.txt
 #SBATCH -e ./Slurm/_slurm_error_plan_%j.txt
+#SBATCH --exclude=dlc-meowth,dlc-arceus
 
 echo "Running on GPU node: $(hostname)"
 
@@ -29,5 +30,5 @@ echo "nnUNet_preprocessed: $nnUNet_preprocessed"
 echo "nnUNet_results: $nnUNet_results"
 
 python3 -u nnunetv2/experiment_planning/plan_and_preprocess_entrypoints.py \
-    -d 501 \
+    -d 601 \
     -c 2d \

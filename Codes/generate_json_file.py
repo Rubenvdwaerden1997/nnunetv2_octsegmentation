@@ -103,7 +103,7 @@ def generate_dataset_json(output_folder: str,
 
 
 def main():
-    task_name = r'Dataset501'
+    task_name = r'Dataset601_TS3D3'
     output_base = r'Z:\rubenvdw\nnunetv2\nnUNet\nnunetv2\Data\nnUNet_raw'
     file_ending='.nii'
     RGB=False
@@ -137,7 +137,7 @@ def main():
                 channel_names[index] = f'image{i}'
                 index += 1
     
-    labels={'background':0,'lumen':1,'guidewire':2, 'intima':3, 'lipid':4, 'calcium':5, 'media':6, 'catheter':7, 'sidebranch':8, 'rthrombus':9, 'wthrombus':10, 'dissection':11, 'rupture':12, 'healed plaque':13, 'neovascularization':14}
+    labels={'background':0,'lumen':1,'guidewire':2, 'intima':3, 'lipid':4, 'calcium':5, 'media':6, 'catheter':7, 'sidebranch':8, 'rthrombus':9, 'wthrombus':10, 'rupture':11, 'healed plaque':12, 'neovascularization':13}
 
     train_identifiers = get_identifiers_from_splitted_dataset_folder(join(target_base, 'imagesTr'), file_ending)
     test_identifiers = get_identifiers_from_splitted_dataset_folder(join(target_base, 'imagesTs'), file_ending)

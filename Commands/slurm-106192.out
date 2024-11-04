@@ -1,0 +1,40 @@
+pyxis: importing docker image: doduo2.umcn.nl#rubenvdw/train_monai:v1.3
+pyxis: imported docker image: doduo2.umcn.nl#rubenvdw/train_monai:v1.3
+[I 2024-11-04 09:07:33.411 ServerApp] Package jupyterlab took 0.0000s to import
+[I 2024-11-04 09:07:33.420 ServerApp] Package jupyter_lsp took 0.0084s to import
+[W 2024-11-04 09:07:33.421 ServerApp] A `_jupyter_server_extension_points` function was not found in jupyter_lsp. Instead, a `_jupyter_server_extension_paths` function was found and will be used for now. This function name will be deprecated in future releases of Jupyter Server.
+[I 2024-11-04 09:07:33.424 ServerApp] Package jupyter_server_terminals took 0.0032s to import
+[I 2024-11-04 09:07:33.425 ServerApp] Package notebook_shim took 0.0000s to import
+[W 2024-11-04 09:07:33.425 ServerApp] A `_jupyter_server_extension_points` function was not found in notebook_shim. Instead, a `_jupyter_server_extension_paths` function was found and will be used for now. This function name will be deprecated in future releases of Jupyter Server.
+[I 2024-11-04 09:07:33.426 ServerApp] jupyter_lsp | extension was successfully linked.
+[I 2024-11-04 09:07:33.430 ServerApp] jupyter_server_terminals | extension was successfully linked.
+[I 2024-11-04 09:07:33.435 ServerApp] jupyterlab | extension was successfully linked.
+[I 2024-11-04 09:07:33.607 ServerApp] notebook_shim | extension was successfully linked.
+[I 2024-11-04 09:07:33.620 ServerApp] notebook_shim | extension was successfully loaded.
+[I 2024-11-04 09:07:33.624 ServerApp] jupyter_lsp | extension was successfully loaded.
+[I 2024-11-04 09:07:33.624 ServerApp] jupyter_server_terminals | extension was successfully loaded.
+[I 2024-11-04 09:07:33.625 LabApp] JupyterLab extension loaded from /usr/local/lib/python3.11/site-packages/jupyterlab
+[I 2024-11-04 09:07:33.625 LabApp] JupyterLab application directory is /usr/local/share/jupyter/lab
+[I 2024-11-04 09:07:33.626 LabApp] Extension Manager is 'pypi'.
+[I 2024-11-04 09:07:33.628 ServerApp] jupyterlab | extension was successfully loaded.
+[I 2024-11-04 09:07:33.629 ServerApp] Serving notebooks from local directory: /data/diag/rubenvdw/nnunetv2/nnUNet
+[I 2024-11-04 09:07:33.629 ServerApp] Jupyter Server 2.5.0 is running at:
+[I 2024-11-04 09:07:33.629 ServerApp] http://dlc-groudon:8888/lab?token=7e684cb23da076fcf0f80dc10819e0b5e1f9b87296550d76
+[I 2024-11-04 09:07:33.629 ServerApp]     http://127.0.0.1:8888/lab?token=7e684cb23da076fcf0f80dc10819e0b5e1f9b87296550d76
+[I 2024-11-04 09:07:33.629 ServerApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+[E 2024-11-04 09:07:33.656 ServerApp] Failed to write server-info to /home/rubenvanderwaerden/.local/share/jupyter/runtime/jpserver-331305.json: OSError(122, 'Disk quota exceeded')
+Traceback (most recent call last):
+  File "/usr/local/bin/jupyter-lab", line 8, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/jupyter_server/extension/application.py", line 617, in launch_instance
+    serverapp.start()
+  File "/usr/local/lib/python3.11/site-packages/jupyter_server/serverapp.py", line 2896, in start
+    self.start_app()
+  File "/usr/local/lib/python3.11/site-packages/jupyter_server/serverapp.py", line 2811, in start_app
+    self.write_browser_open_files()
+  File "/usr/local/lib/python3.11/site-packages/jupyter_server/serverapp.py", line 2678, in write_browser_open_files
+    self.write_browser_open_file()
+  File "/usr/local/lib/python3.11/site-packages/jupyter_server/serverapp.py", line 2701, in write_browser_open_file
+    with open(self.browser_open_file, "w", encoding="utf-8") as f:
+OSError: [Errno 122] Disk quota exceeded

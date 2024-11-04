@@ -159,8 +159,8 @@ def intima_cap_area_v2(image):
     vessel_com = sim.center_of_mass(vessel_center)
     #Merge HP,NV and calcium to intima (label=3)
     #new_image[image==5]=3 #Calcium
-    new_image[image==13]=3 #HP
-    new_image[image==14]=3 #NV
+    new_image[image==12]=3 #HP
+    new_image[image==13]=3 #NV
     # Create empty sets to store unique angles for intima (3) and lipid(4)
     angles_with_intima = set()
     angles_with_lipid = set()
@@ -318,9 +318,8 @@ def create_annotations_lipid(image, font = 'cluster', bin_size = 2):
         new_image[new_image == 9] = 10
         new_image[new_image == 10] = 10
         new_image[new_image == 11] = 10
-        new_image[new_image == 12] = 10
+        new_image[new_image == 12] = 3
         new_image[new_image == 13] = 3
-        new_image[new_image == 14] = 3
 
         edges1 = np.abs(np.diff(new_image, axis=0))
         edges2 = np.abs(np.diff(new_image, axis=1))
@@ -680,9 +679,8 @@ def create_annotations_calcium(image, font = 'cluster', bin_size = 2):
         new_image[new_image == 9] = 10
         new_image[new_image == 10] = 10
         new_image[new_image == 11] = 10
-        new_image[new_image == 12] = 10
+        new_image[new_image == 12] = 3
         new_image[new_image == 13] = 3
-        new_image[new_image == 14] = 3
 
         edges1 = np.abs(np.diff(new_image, axis=0))
         edges2 = np.abs(np.diff(new_image, axis=1))

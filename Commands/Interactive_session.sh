@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --qos=high
+#SBATCH --qos=low
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=6
 #SBATCH --gpus-per-task=1
@@ -9,7 +9,8 @@
 #SBATCH --job-name=jupyter_lab
 #SBATCH --no-container-entrypoint
 #SBATCH --container-mounts=/data/diag:/data/diag \
-#SBATCH --container-image="doduo2.umcn.nl#rubenvdw/train_monai:v1.3"
+#SBATCH --container-image="doduo1.umcn.nl#rubenvdw/nnunetv2:1.3"
+#SBATCH --exclude=dlc-meowth,dlc-arceus
 
 # Change directory to the mounted path
 cd /data/diag/rubenvdw/nnunetv2/nnUNet

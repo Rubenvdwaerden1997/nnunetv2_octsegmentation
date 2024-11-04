@@ -7,10 +7,10 @@
 #SBATCH --no-container-entrypoint
 #SBATCH --container-mounts=/data/diag:/data/diag,/data/diag/rubenvdw/nnunetv2/nnUNet/nnunetv2/Data:/home/user/Data
 #SBATCH --container-image="doduo1.umcn.nl#rubenvdw/nnunetv2:1.3"
-#SBATCH --qos=high
-#SBATCH -o ./Slurm/_slurm_output_predict_%j.txt
-#SBATCH -e ./Slurm/_slurm_error_predict_%j.txt
-#SBATCH --exclude=dlc-meowth,dlc-arceus,dlc-articuno
+#SBATCH --qos=low
+#SBATCH -o ./Slurm/_slurm_output_train3_%j.txt
+#SBATCH -e ./Slurm/_slurm_error_train3_%j.txt
+#SBATCH --exclude=dlc-meowth,dlc-arceus
 
 echo "Running on GPU node: $(hostname)"
 
@@ -27,10 +27,8 @@ echo "nnUNet_raw: $nnUNet_raw"
 echo "nnUNet_preprocessed: $nnUNet_preprocessed"
 echo "nnUNet_results: $nnUNet_results"
 
-python3 -u nnunetv2/inference/predict_from_raw_data.py \
-    -i /data/diag/rubenvdw/nnunetv2/nnUNet/nnunetv2/Data/nnUNet_raw/Dataset601_TS3D3/imagesTs \
-    -o /data/diag/rubenvdw/nnunetv2/nnUNet/nnunetv2/Predictions/Dataset601_TS3D3/Predicted_files \
-    -d 601 \
-    -c 2d \
-    --save_probabilities \
-    -f 0
+python3 -u nnunetv2/run/run_training.py \
+    601 \
+    2d \
+    3 \
+    --c \

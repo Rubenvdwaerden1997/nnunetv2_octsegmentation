@@ -11,7 +11,7 @@
 #SBATCH --qos=high
 #SBATCH --exclude=dlc-meowth,dlc-arceus,dlc-articuno
 
-python3 -u /data/diag/rubenvdw/nnunetv2/nnUNet/Codes/Metrics/Metrics_all.py \
+python3 -u /data/diag/rubenvdw/nnunetv2/nnUNet/nnunetv2/Codes/Metrics/Metrics_all.py \
     --orig_folder /data/diag/rubenvdw/nnunetv2/nnUNet/nnunetv2/Data/nnUNet_raw/Dataset905_SegmentOCT3d3/labelsTs \
     --preds_folder /data/diag/rubenvdw/nnunetv2/nnUNet/nnunetv2/Predictions/Dataset905_SegmentOCT3d3/Predicted_files_postprocessing \
     --data_info /data/diag/rubenvdw/Info_files_Dataset_split/15_classes_dataset_split_extraframes_13062024.xlsx \

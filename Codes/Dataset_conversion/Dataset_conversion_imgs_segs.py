@@ -14,12 +14,13 @@ from rgb_to_gray_mapping import rgb_to_grayscale_with_mapping
 def main(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_input', type=str, nargs='+', default=['Z:/rubenvdw/Dataset/DICOMS_15classes', 'Z:/rubenvdw/Dataset/DICOMS_Orange'], help="Paths to one or more data directories.")
-    parser.add_argument('--data_label', type=str, default='Z:/rubenvdw/Dataset/SEGMENTATIONS_15_classes')
+    parser.add_argument('--data_label', type=str, default='Z:/rubenvdw/Dataset/SEGMENTATIONS_15classes_25102024')
     parser.add_argument('--outfolder', type=str, default='Z:/rubenvdw/nnunetv2/nnUnet/nnunetv2/Data/nnUNet_raw')
     parser.add_argument('--task', type=str, default='Dataset601')
     parser.add_argument('--k', type=int, default=3)
     parser.add_argument('--radius', type=int, default=352)
     parser.add_argument('--splitfile', type=str, default='Z:/rubenvdw/Info_files_Dataset_split/15_classes_dataset_split_extraframes_25102024.xlsx')
+    parser.add_argument('--preprocessing', action='store_true', help="Enable preprocessing.")
     args, _ = parser.parse_known_args(argv)
 
     input_data_folders = args.data_input
@@ -77,6 +78,13 @@ def main(argv):
             time_end_read_seg = time.time()
             print('Time elapsed reading Segmentation: ', time_end_read_seg - time_read_seg)
 
+            if args.preprocessing:
+                print('Preprocessing combining labels...')
+                series_array_labeldata[series_array_labeldata==11]=3  # Dissection becomes intima
+                series_array_labeldata[series_array_labeldata==12]=11 # Because continuous order (no gaps), plaque rupture becomes lowest available class
+                series_array_labeldata[series_array_labeldata==13]=12 # Because continuous order (no gaps), layered plaque becomes lowest available class
+                series_array_labeldata[series_array_labeldata==14]=13 # Because continuous order (no gaps), neovascularization becomes lowest available class
+                print('Preprocessing done. Dissection is intima and other classes are shifted down by 1 to keep continuous order')
             #Get frames with annotations in the pullback
             frames_with_annot = annots.loc[annots['Pullback'] == pullback_name]['Frames']
             frames_list = [int(i)-1 for i in frames_with_annot.values[0].split(',')]

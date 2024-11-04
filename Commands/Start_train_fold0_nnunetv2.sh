@@ -28,7 +28,7 @@ echo "nnUNet_preprocessed: $nnUNet_preprocessed"
 echo "nnUNet_results: $nnUNet_results"
 
 python3 -u nnunetv2/run/run_training.py \
-    501 \
+    601 \
     2d \
     0 \
     --c \
