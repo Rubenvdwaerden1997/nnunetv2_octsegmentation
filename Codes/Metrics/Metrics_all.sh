@@ -12,11 +12,11 @@
 #SBATCH --exclude=dlc-meowth,dlc-arceus,dlc-articuno
 
 python3 -u /data/diag/rubenvdw/nnunetv2/nnUNet/nnunetv2/Codes/Metrics/Metrics_all.py \
-    --orig_folder /data/diag/rubenvdw/nnunetv2/nnUNet/nnunetv2/Data/nnUNet_raw/Dataset905_SegmentOCT3d3/labelsTs \
-    --preds_folder /data/diag/rubenvdw/nnunetv2/nnUNet/nnunetv2/Predictions/Dataset905_SegmentOCT3d3/Predicted_files_postprocessing \
-    --data_info /data/diag/rubenvdw/Info_files_Dataset_split/15_classes_dataset_split_extraframes_13062024.xlsx \
-    --filename Dataset905_SegmentOCT3d3_postprocessing \
-    --num_classes 15 \
-    --output_folder /data/diag/rubenvdw/nnunetv2/nnUNet/nnunetv2/Predictions/Dataset905_SegmentOCT3d3/Metrics \
-    --counts_testset /data/diag/rubenvdw/nnunetv2/nnUNet/nnunetv2/Predictions/Dataset905_SegmentOCT3d3/Metrics/Counts_labels.xlsx \
-    --counts_predictiontestset /data/diag/rubenvdw/nnunetv2/nnUNet/nnunetv2/Predictions/Dataset905_SegmentOCT3d3/Metrics/Counts_predictions_postprocessing.xlsx
+    --orig_folder /data/diag/rubenvdw/nnunetv2/nnUNet/nnunetv2/Data/nnUNet_raw/Dataset601_TS3D3/labelsTs \
+    --preds_folder /data/diag/rubenvdw/nnunetv2/nnUNet/nnunetv2/Predictions/Dataset601_TS3D3/Predicted_files_postprocessing \
+    --data_info /data/diag/rubenvdw/Info_files_Dataset_split/15_classes_dataset_newsplit_29102024.xlsx \
+    --filename Dataset601_TS3D3_postprocessing_v2 \
+    --num_classes 14 \
+    --output_folder /data/diag/rubenvdw/nnunetv2/nnUNet/nnunetv2/Predictions/Dataset601_TS3D3/Metrics \
+    --counts_testset /data/diag/rubenvdw/nnunetv2/nnUNet/nnunetv2/Predictions/Dataset601_TS3D3/Metrics/Counts_labels.xlsx \
+    --counts_predictiontestset /data/diag/rubenvdw/nnunetv2/nnUNet/nnunetv2/Predictions/Dataset601_TS3D3/Metrics/Counts_predictions_postprocessing.xlsx

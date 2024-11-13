@@ -9,7 +9,7 @@ import sys
 import skimage
 import time
 from matplotlib.backends.backend_pdf import PdfPages
-sys.path.insert(1, '/data/diag/rubenvdw/nnunetv2/nnUNet/Codes/utils')
+sys.path.insert(1, '/data/diag/rubenvdw/nnunetv2/nnUNet/nnunetv2/Codes/utils')
 from postprocessing import create_annotations_lipid, create_annotations_calcium, intima_cap_area_v2
 from counts_utils import create_image_png
 

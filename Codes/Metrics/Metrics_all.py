@@ -10,7 +10,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 import sys
 import argparse
-sys.path.insert(1, '/data/diag/rubenvdw/nnunetv2/nnUNet/Codes/utils')
+sys.path.insert(1, '/data/diag/rubenvdw/nnunetv2/nnUNet/nnunetv2/Codes/utils')
 from counts_utils import merge_frames_into_pullbacks
 from postprocessing import create_annotations_lipid, create_annotations_calcium, compute_arc_dices
 from metrics_utils import mean_metrics, calculate_confusion_matrix, metrics_from_cm
@@ -100,6 +100,23 @@ class Metrics:
                 7.0: 'plaque_rupture',
                 8.0: 'sidebranch',
                 9.0: 'thrombus',
+            }
+        elif self.num_classes==14:
+            label_names = {
+                0.0: 'background',
+                1.0: 'lumen',
+                2.0: 'guidewire',
+                3.0: 'intima',
+                4.0: 'lipid',
+                5.0: 'calcium',
+                6.0: 'media',
+                7.0: 'catheter',
+                8.0: 'sidebranch',
+                9.0: 'rthrombus',
+                10.0: 'wthrombus',
+                11.0: 'plaque_rupture',
+                12.0: 'layered_plaque',
+                13.0: 'neovascularization',
             }
         return label_names.get(float(label), f'Unknown-{label}')
 
@@ -277,7 +294,7 @@ class Metrics:
 
         for file in os.listdir(self.preds_folder):
 
-            if file.endswith('nii.gz'):
+            if file.endswith('nii.gz') or file.endswith('nii'):
             
                 print('Checking case', file[:-7])
                 orig_seg = sitk.GetArrayFromImage(sitk.ReadImage(os.path.join(self.orig_folder, file)))

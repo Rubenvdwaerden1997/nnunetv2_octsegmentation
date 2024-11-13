@@ -28,7 +28,7 @@ echo "nnUNet_preprocessed: $nnUNet_preprocessed"
 echo "nnUNet_results: $nnUNet_results"
 
 python3 -u nnunetv2/evaluation/evaluate_predictions.py \
-    /data/diag/rubenvdw/nnunetv2/nnUNet/nnunetv2/Data/nnUNet_raw/Dataset501/labelsTs \
-    /data/diag/rubenvdw/nnunetv2/nnUNet/nnunetv2/Predictions/Dataset501/Predicted_files_postprocessing \
-    -djfile /data/diag/rubenvdw/nnunetv2/nnUNet/nnunetv2/Predictions/Dataset501/Predicted_files/dataset.json \
-    -pfile /data/diag/rubenvdw/nnunetv2/nnUNet/nnunetv2/Predictions/Dataset501/Predicted_files/plans.json
+    /data/diag/rubenvdw/nnunetv2/nnUNet/nnunetv2/Data/nnUNet_raw/Dataset601_TS3D3/labelsTs \
+    /data/diag/rubenvdw/nnunetv2/nnUNet/nnunetv2/Predictions/Dataset601_TS3D3/Predicted_files_postprocessing \
+    -djfile /data/diag/rubenvdw/nnunetv2/nnUNet/nnunetv2/Predictions/Dataset601_TS3D3/Predicted_files/dataset.json \
+    -pfile /data/diag/rubenvdw/nnunetv2/nnUNet/nnunetv2/Predictions/Dataset601_TS3D3/Predicted_files/plans.json
