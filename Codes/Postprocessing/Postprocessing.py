@@ -6,6 +6,7 @@ import argparse
 import sys
 import ast
 from pathlib import Path
+import torch
 
 import skimage as ski
 
@@ -29,9 +30,19 @@ def get_surrounding_for1(coord):
 
 
 def pixel_post_one(filename, classesPixels, comb_thr, numClasses):
-    #Reading the test file and acquiring the array:
-    orig_seg = sitk.ReadImage(filename)
-    orig_seg_pixel_array = sitk.GetArrayFromImage(orig_seg)
+    # Check if filename is already an array
+    if isinstance(filename, torch.Tensor):
+        orig_seg_pixel_array = filename
+        if orig_seg_pixel_array.dim() == 2:  # If it has shape (H, W), add a new first dimension
+            orig_seg_pixel_array = orig_seg_pixel_array.unsqueeze(0)
+    elif isinstance(filename, np.ndarray):
+        orig_seg_pixel_array = filename
+        if orig_seg_pixel_array.ndim == 2:  # If it has shape (H, W), add a new first dimension
+            orig_seg_pixel_array = np.expand_dims(orig_seg_pixel_array, axis=0)
+    else:
+        # Load the image if filename is not an array
+        orig_seg = sitk.ReadImage(filename)
+        orig_seg_pixel_array = sitk.GetArrayFromImage(orig_seg)
 
     if comb_thr == 1:
         orig_seg_pixel_array[orig_seg_pixel_array==9] = 10

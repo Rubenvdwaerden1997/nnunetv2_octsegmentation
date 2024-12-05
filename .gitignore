@@ -11,6 +11,7 @@ Data/
 Predictions/
 Data_info/
 Commands/Slurm/
+Commands/OLD/
 
 # Distribution / packaging
 .Python

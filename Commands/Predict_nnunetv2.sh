@@ -33,4 +33,3 @@ python3 -u nnunetv2/inference/predict_from_raw_data.py \
     -d 601 \
     -c 2d \
     --save_probabilities \
-    -f 0
