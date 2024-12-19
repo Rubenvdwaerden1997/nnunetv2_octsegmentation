@@ -101,14 +101,15 @@ def pixel_post_many(annotations_folder_path, output_folder_path, classesPixels, 
     filenames = os.listdir(annotations_folder_path)
     for filename in filenames:
         if filename.endswith('.nii.gz') or filename.endswith('.nii'):
-    
+            #Need to change later
+            final_path = f'{output_folder_path}/{filename}'
+            if os.path.exists(final_path):
+                print(f'File {final_path} already exists. Skipping...')
+                continue
             #Need to change later. Need to get all filenames one by one
             file_path = f'{annotations_folder_path}/{filename}'
     
             final_array = pixel_post_one(file_path, classesPixels, comb_thr, numClasses)
-    
-            #Need to change later
-            final_path = f'{output_folder_path}/{filename}'
     
             #Correct spacing and direction and save as nifti
             final_frame = sitk.GetImageFromArray(final_array.astype(np.uint32))

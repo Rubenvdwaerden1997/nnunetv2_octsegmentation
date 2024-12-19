@@ -39,14 +39,14 @@ def delete_temp_folders(parent_folder):
     """Delete all temp folders and wait until they are fully deleted."""
     for item in os.listdir(parent_folder):
         item_path = os.path.join(parent_folder, item)
-        if os.path.isdir(item_path) and item.startswith("temp"):
+        if os.path.isdir(item_path) and item.startswith("tempfolder"):
             # Delete the folder
             shutil.rmtree(item_path)
             print(f"Deleting folder: {item_path}")
             time_start_deletion = time.time()
             # Wait until the folder is fully deleted
             while os.path.exists(item_path):
-                time.sleep(10)  # Check every 100ms
+                time.sleep(10)  # Check every 10s
                 time_end_deletion = time.time()
                 print(f'Time elapsed: {time_end_deletion - time_start_deletion} seconds.')
 
@@ -65,7 +65,6 @@ def main():
     print(f'Parent folder: {parent_folder}')
     output_temp_folder = os.path.join(parent_folder, "tempfolder1")
     
-
     # Parse scripts and arguments
     for file_sep in os.listdir(args.input_folder):
         os.makedirs(output_temp_folder, exist_ok=True)

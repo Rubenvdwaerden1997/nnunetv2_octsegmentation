@@ -10,35 +10,42 @@ def concatenate_nii_files(folder_path, output_path, file_sep,file_extension=".ni
     nii_files = natsorted(nii_files)  # Natural sorting of filenames
     
     # Generate a custom file name based on the first file in the list
-    file_format = f'{file_sep.split(".")[0]}_HPNV.nii.gz'
+    file_format = f'{file_sep.split(".")[0]}_HPNV'
 
-    # Read and concatenate images using SimpleITK
-    images = [sitk.GetArrayFromImage(sitk.ReadImage(f)) for f in nii_files]
-    concatenated_array = np.concatenate(images, axis=concatenate_axis)  # Concatenate along the specified dimension
+    if file_extension==".nii" or file_extension==".nii.gz":
+        file_format = f'{file_format}.nii.gz'
+        # Read and concatenate images using SimpleITK
+        images = [sitk.GetArrayFromImage(sitk.ReadImage(f)) for f in nii_files]
+        concatenated_array = np.concatenate(images, axis=concatenate_axis)  # Concatenate along the specified dimension
+        # Convert the concatenated array back to a SimpleITK image
+        concatenated_image = sitk.GetImageFromArray(concatenated_array)
 
-    # Convert the concatenated array back to a SimpleITK image
-    concatenated_image = sitk.GetImageFromArray(concatenated_array)
+        # Set the origin, spacing, and direction from the first image (metadata)
+        first_image = sitk.ReadImage(nii_files[0])
+        concatenated_image.SetOrigin(first_image.GetOrigin())
+        concatenated_image.SetSpacing(first_image.GetSpacing())
+        concatenated_image.SetDirection(first_image.GetDirection())
 
-    # Set the origin, spacing, and direction from the first image (metadata)
-    first_image = sitk.ReadImage(nii_files[0])
-    concatenated_image.SetOrigin(first_image.GetOrigin())
-    concatenated_image.SetSpacing(first_image.GetSpacing())
-    concatenated_image.SetDirection(first_image.GetDirection())
+        # Save the concatenated image with the custom file name
+        sitk.WriteImage(concatenated_image, os.path.join(output_path, file_format))
+    elif file_extension==".npz":
+        images = [np.load(f)['probabilities'] for f in nii_files] # shape is channels, 1, 704,704
+        images = [np.moveaxis(img, 0, 1) for img in images]  # shape conversion to 1, channels, 704,704
+        concatenated_array = np.concatenate(images, axis=concatenate_axis)
 
-    # Save the concatenated image with the custom file name
-    sitk.WriteImage(concatenated_image, os.path.join(output_path, file_format))
+        np.savez_compressed(os.path.join(output_path, file_format), probabilities=concatenated_array)
+
     print(f"Concatenated image saved to: {os.path.join(output_path, file_format)}")
-
     
 def main():
     # Set up argument parser
     parser = argparse.ArgumentParser(description="Concatenate .nii files along the specified dimension")
     
     # Use optional arguments (with '--')
-    parser.add_argument('--folder_path', type=str, default=r'Z:\rubenvdw\Dataset\Test_pullback_predictions\tempfolder1', help="Path to the folder containing the .nii files")
-    parser.add_argument('--output_path', type=str, default=r'Z:\rubenvdw\Dataset\Test_pullback_predictions\Output', help="Path to the output folder where the concatenated file will be saved")
-    parser.add_argument('--file_sep', type=str, default='EST-NEMC-0005-LAD.dcm', help="Seperate file name, used to save correct filename")
-    parser.add_argument('--file_extension', type=str, default=".nii", help="File extension for the .nii files (default: .nii)")
+    parser.add_argument('--folder_path', type=str, default=r'Z:\rubenvdw\Dataset\blab', help="Path to the folder containing the .nii files")
+    parser.add_argument('--output_path', type=str, default=r'Z:\rubenvdw\Dataset\blab', help="Path to the output folder where the concatenated file will be saved")
+    parser.add_argument('--file_sep', type=str, default='NLD-RADB-0022.dcm', help="Seperate file name, used to save correct filename")
+    parser.add_argument('--file_extension', type=str, default=".npz", help="File extension for the .nii files (default: .nii)")
     parser.add_argument('--concatenate_axis', type=int, default=0, choices=[0, 1, 2], help="Axis to concatenate along (default: 0)")
 
     # Parse the arguments
