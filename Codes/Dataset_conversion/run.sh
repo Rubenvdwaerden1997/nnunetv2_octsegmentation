@@ -7,10 +7,10 @@
 #SBATCH --container-mounts=/data/diag:/data/diag
 #SBATCH --container-image="doduo2.umcn.nl#rubenvdw/train_monai:v1.3"
 #SBATCH --qos=high
-#SBATCH -o _slurm_output_pseudo_%j.txt
-#SBATCH -e _slurm_error_pseudo_%j.txt
+#SBATCH -o _slurm_output_%j.txt
+#SBATCH -e _slurm_error_%j.txt
 #SBATCH --exclude=dlc-meowth,dlc-nidoking,dlc-articuno
-#SBATCH --nodelist=dlc-tornadus
+#SBATCH --nodelist=dlc-arceus
 
 cd /data/diag/rubenvdw/nnunetv2/nnUNet/nnunetv2/Codes/Dataset_conversion
 
@@ -25,10 +25,8 @@ python3 -u Dataset_conversion_imgs_segs.py \
     --k 3 \
     --radius 352 \
     --preprocessing \
-    --output_folder Input_pseudo_images
-
-    # --data_label '/data/diag/rubenvdw/Dataset/SEGMENTATIONS_15classes_25102024' \
-    # --outfolder '/data/diag/rubenvdw/nnunetv2/nnUnet/nnunetv2/Data/nnUNet_raw' \
-    # --task Dataset711_TS3D3 \
-    # --trainmode \
-    # --splitfile '/data/diag/rubenvdw/Info_files_Dataset_split/15_classes_dataset_newsplit_29102024.xlsx' \
+    --data_label '/data/diag/rubenvdw/Dataset/SEGMENTATIONS_15classes_25102024' \
+    --outfolder '/data/diag/rubenvdw/nnunetv2/nnUnet/nnunetv2/Data/nnUNet_raw' \
+    --task Dataset711_TS3D3 \
+    --trainmode \
+    --splitfile '/data/diag/rubenvdw/Info_files_Dataset_split/15_classes_dataset_newsplit_29102024.xlsx' \

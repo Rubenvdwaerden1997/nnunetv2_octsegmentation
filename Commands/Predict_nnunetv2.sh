@@ -2,7 +2,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=12
 #SBATCH --gpus-per-task=1
-#SBATCH --mem=20G
+#SBATCH --mem=24G
 #SBATCH --time=168:00:00
 #SBATCH --no-container-entrypoint
 #SBATCH --container-mounts=/data/diag:/data/diag,/data/diag/rubenvdw/nnunetv2/nnUNet/nnunetv2/Data:/home/user/Data
@@ -10,7 +10,8 @@
 #SBATCH --qos=high
 #SBATCH -o ./Slurm/_slurm_output_predict_%j.txt
 #SBATCH -e ./Slurm/_slurm_error_predict_%j.txt
-#SBATCH --exclude=dlc-meowth,dlc-arceus,dlc-articuno
+#SBATCH --exclude=dlc-meowth,dlc-nidoking,dlc-articuno,dlc-electabuzz,dlc-mewtwo
+
 
 echo "Running on GPU node: $(hostname)"
 
@@ -28,8 +29,8 @@ echo "nnUNet_preprocessed: $nnUNet_preprocessed"
 echo "nnUNet_results: $nnUNet_results"
 
 python3 -u nnunetv2/inference/predict_from_raw_data.py \
-    -i /data/diag/rubenvdw/nnunetv2/nnUNet/nnunetv2/Data/nnUNet_raw/Dataset601_TS3D3/imagesTs \
-    -o /data/diag/rubenvdw/nnunetv2/nnUNet/nnunetv2/Predictions/Dataset601_TS3D3/Predicted_files \
+    -i /data/diag/rubenvdw/Dataset/Pseudo_images_input \
+    -o /data/diag/rubenvdw/Dataset/Pseudo_labels_output \
     -d 601 \
     -c 2d \
     --save_probabilities \

@@ -26,8 +26,8 @@ def main(argv):
     parser.add_argument('--preprocessing', action='store_true', help="Enable preprocessing.")
     parser.add_argument('--trainmode', action='store_true', help="Enable train mode.")
     parser.add_argument('--file_sep', type=str, help="If not train mode, but pipeline, file_sep is a seperate file that is used.")
-    parser.add_argument('--in_memory', action='store_true', help="Save in memory, instead of saving to disk.")
     parser.add_argument('--output_folder', type=str, default=r'tempfolder0', help="Output folder for in memory.")
+    parser.add_argument('--pseudo_excelfile', type=str, default=r'Z:\rubenvdw\Info_files_Dataset_split\Pseudo_frames_excludeguidingTrue_excludeartefactFalse.xlsx')
 
     args, _ = parser.parse_known_args(argv)
 
@@ -35,6 +35,8 @@ def main(argv):
     if args.trainmode:
         label_data = args.data_label
         annots = pd.read_excel(args.splitfile)
+    if args.pseudo_excelfile:
+        pseudo_frames_excel=pd.read_excel(args.pseudo_excelfile)
     
     id = 0
     processed_files = set()  # To track files that are already processed
@@ -60,9 +62,6 @@ def main(argv):
                 #Get file data from the metadata Excel file
                 pullback_name = file_sep.split('.')[0]
 
-
-
-                
                 if args.trainmode:
                     if pullback_name not in annots['Pullback'].values:
                         print(f'Pullback: {pullback_name}, not in current training set')
@@ -84,14 +83,21 @@ def main(argv):
                     id = int(annots.loc[annots['Patient'] == patient_name]['ID'].values[0])
 
                     n_pullback = int(annots.loc[annots['Pullback'] == pullback_name]['Nº pullback'].values[0])
+                elif args.pseudo_excelfile:
+                    belonging_set = pseudo_frames_excel.loc[pseudo_frames_excel['Patient'] == patient_name]['Set'].values[0]
+                    #Output folder 
+                    if belonging_set != 'Training':
+                        print(f'Pullback: {pullback_name}, in set: {belonging_set}')
+                        continue
+                    output_file_path_input = f'{os.path.dirname(input_data_folder)}/{args.output_folder}'
+                    os.makedirs(output_file_path_input, exist_ok=True)
+                    id = int(pseudo_frames_excel.loc[pseudo_frames_excel['Patient'] == patient_name]['ID'].values[0])
+                    n_pullback = int(pseudo_frames_excel.loc[pseudo_frames_excel['Pullback'] == pullback_name]['Nº pullback'].values[0])
                 else:
                     output_file_path_input = f'{os.path.dirname(input_data_folder)}/{args.output_folder}'
                     os.makedirs(output_file_path_input, exist_ok=True)
                     id += 1
                     n_pullback += 1
-                
-
-
 
                 print('Reading pullback: ', pullback_name)
                 #Load the input files to create a list of slices
@@ -125,11 +131,11 @@ def main(argv):
                     #Get frames with annotations in the pullback
                     frames_with_annot = annots.loc[annots['Pullback'] == pullback_name]['Frames']
                     frames_list = [int(i)-1 for i in frames_with_annot.values[0].split(',')]
+                elif args.pseudo_excelfile:
+                    frames_with_annotations = pseudo_frames_excel.loc[pseudo_frames_excel['Pullback']==pullback_name]['Pseudo_frames']
+                    frames_list = [int(i)-1 for i in frames_with_annotations.values[0].split(',')]
                 else:
                     frames_list = range(len(masked_series_array_inputdata_gray))
-
-                if args.in_memory:
-                    return masked_series_array_inputdata_gray
                 
                 time_start = time.time()
                 for frame in range(len(masked_series_array_inputdata_gray)):
