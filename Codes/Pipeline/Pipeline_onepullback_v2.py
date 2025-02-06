@@ -66,6 +66,7 @@ def main():
     output_temp_folder = os.path.join(parent_folder, "tempfolder1")
     
     # Parse scripts and arguments
+    delete_temp_folders(parent_folder)
     for file_sep in os.listdir(args.input_folder):
         os.makedirs(output_temp_folder, exist_ok=True)
         scripts = []

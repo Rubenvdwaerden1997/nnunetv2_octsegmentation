@@ -129,7 +129,7 @@ class DefaultPreprocessor(object):
 
         # load image(s)
         data, data_properties = rw.read_images(image_files)
-
+        
         # if possible, load seg
         if seg_file is not None:
             seg, _ = rw.read_seg(seg_file)

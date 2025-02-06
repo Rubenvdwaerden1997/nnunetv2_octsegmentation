@@ -6,12 +6,11 @@
 #SBATCH --time=168:00:00
 #SBATCH --no-container-entrypoint
 #SBATCH --container-mounts=/data/diag:/data/diag,/data/diag/rubenvdw/nnunetv2/nnUNet/nnunetv2/Data:/home/user/Data
-#SBATCH --container-image="doduo1.umcn.nl#rubenvdw/nnunetv2:1.3"
+#SBATCH --container-image="doduo.umcn.nl#rubenvdw/nnunetv2:1.3"
 #SBATCH --qos=high
 #SBATCH -o ./Slurm/_slurm_output_predict_%j.txt
 #SBATCH -e ./Slurm/_slurm_error_predict_%j.txt
-#SBATCH --exclude=dlc-meowth,dlc-nidoking,dlc-articuno,dlc-electabuzz,dlc-mewtwo
-
+#SBATCH --exclude=dlc-meowth,dlc-mewtwo,dlc-nidoking,dlc-electabuzz
 
 echo "Running on GPU node: $(hostname)"
 
@@ -34,3 +33,4 @@ python3 -u nnunetv2/inference/predict_from_raw_data.py \
     -d 601 \
     -c 2d \
     --save_probabilities \
+    --continue_prediction  

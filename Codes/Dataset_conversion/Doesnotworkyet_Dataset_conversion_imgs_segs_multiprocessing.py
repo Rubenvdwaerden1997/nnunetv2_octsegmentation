@@ -28,7 +28,7 @@ def process_pullback(params):
     os.makedirs(output_file_path_input, exist_ok=True)
     os.makedirs(output_file_path_label, exist_ok=True)
 
-    # Load input DICOM
+    # Load input DICOMR
     series_inputdata = sitk.ReadImage(full_filename_inputdata)
     series_array_inputdata = sitk.GetArrayFromImage(series_inputdata)
     circular_mask_dcm = create_circular_mask(series_array_inputdata.shape[1], series_array_inputdata.shape[2], channels=series_array_inputdata.shape[3])

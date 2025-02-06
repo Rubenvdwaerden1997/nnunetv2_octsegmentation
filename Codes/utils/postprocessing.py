@@ -314,7 +314,7 @@ def create_annotations_lipid(image, font = 'cluster', bin_size = 2):
         new_image[new_image == 5] = 3
         new_image[new_image == 6] = 0
         new_image[new_image == 7] = 1
-        new_image[new_image == 8] = 10
+        new_image[new_image == 8] = 3
         new_image[new_image == 9] = 10
         new_image[new_image == 10] = 10
         new_image[new_image == 11] = 10

@@ -27,7 +27,7 @@ def main(argv):
     parser.add_argument('--trainmode', action='store_true', help="Enable train mode.")
     parser.add_argument('--file_sep', type=str, help="If not train mode, but pipeline, file_sep is a seperate file that is used.")
     parser.add_argument('--output_folder', type=str, default=r'tempfolder0', help="Output folder for in memory.")
-    parser.add_argument('--pseudo_excelfile', type=str, default=r'Z:\rubenvdw\Info_files_Dataset_split\Pseudo_frames_excludeguidingTrue_excludeartefactFalse.xlsx')
+    parser.add_argument('--pseudo_excelfile', type=str, help='default is Z:\rubenvdw\Info_files_Dataset_split\Pseudo_frames_excludeguidingTrue_excludeartefactFalse.xlsx')
 
     args, _ = parser.parse_known_args(argv)
 
