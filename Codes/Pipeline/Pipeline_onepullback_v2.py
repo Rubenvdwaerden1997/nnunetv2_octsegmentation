@@ -58,16 +58,30 @@ def main():
     parser.add_argument("--scripts", type=str, nargs="+", required=True,
                         help="Scripts and arguments. Format: script_path,arg1,arg2,...")
     parser.add_argument("--input_folder", type=str, required=True, help="Path to the input folder")
+    parser.add_argument("--output_folder", type=str, required=True, help="Path to the output folder")
     
     args = parser.parse_args()
     print('Start pipeline')
     parent_folder = os.path.dirname(args.input_folder)
+    os.makedirs(args.output_folder, exist_ok=True)  # Ensure output folder exists
+
     print(f'Parent folder: {parent_folder}')
+    print(f'Output folder: {args.output_folder}')
+    
     output_temp_folder = os.path.join(parent_folder, "tempfolder1")
     
     # Parse scripts and arguments
     delete_temp_folders(parent_folder)
     for file_sep in os.listdir(args.input_folder):
+        if not file_sep.endswith(".dcm"):
+            continue
+        base_filename = file_sep.replace(".dcm", "")  # Remove .dcm
+        expected_output_file = f"{base_filename}_HPNV.nii.gz"
+        output_file_path = os.path.join(args.output_folder, expected_output_file)
+        if os.path.exists(output_file_path):
+            print(f"Skipping {file_sep}, already segmented as {expected_output_file}.")
+            continue  # Move to the next file
+
         os.makedirs(output_temp_folder, exist_ok=True)
         scripts = []
         time_start = time.time()
@@ -86,7 +100,7 @@ def main():
         run_scripts(scripts)
         time_end = time.time()
 
-        print(f'Finished file {file_sep}, in {time_end - time_start} seconds.')
+        print(f'Finished file {file_sep}, in {time_end - time_start:.2f} seconds.')
         delete_temp_folders(parent_folder)
 
     print('Finished pipeline')

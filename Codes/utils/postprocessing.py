@@ -544,7 +544,7 @@ def create_annotations_lipid(image, font = 'cluster', bin_size = 2):
         img1.fontmode = "1"
 
         if font == 'mine':
-            fnt = ImageFont.truetype(r"Z:\rubenvdw\nnU-net\utils\arial-unicode-ms.ttf",32)
+            fnt = ImageFont.truetype(r"W:\rubenvdw\nnU-net\utils\arial-unicode-ms.ttf",32)
 
         elif font == 'cluster':
             fnt = ImageFont.truetype("/data/diag/rubenvdw/nnU-net/utils/arial-unicode-ms.ttf",32)
@@ -919,7 +919,7 @@ def create_annotations_calcium(image, font = 'cluster', bin_size = 2):
         img1.fontmode = "1"
 
         if font == 'mine':
-            fnt = ImageFont.truetype(r"Z:\rubenvdw\nnU-net\utils\arial-unicode-ms.ttf",32)
+            fnt = ImageFont.truetype(r"W:\rubenvdw\nnU-net\utils\arial-unicode-ms.ttf",32)
 
         elif font == 'cluster':
             fnt = ImageFont.truetype("/data/diag/rubenvdw/nnU-net/utils/arial-unicode-ms.ttf",32)

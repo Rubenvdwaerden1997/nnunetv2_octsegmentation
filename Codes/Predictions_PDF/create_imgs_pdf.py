@@ -97,6 +97,7 @@ def find_labels(seg):
     else: nv = 0
 
     return sb, rt, wt, scad, rupture, hp, nv
+    
 
 def morph_operation(img):
     """Performs closing morphological operation (we only perfom this on certain labels)
