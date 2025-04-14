@@ -208,7 +208,7 @@ def intima_cap_area_v2(image):
     intima_cap_area_mm2=intima_cap_area_microns2/1000000
     return final_intima_cap,intima_cap_area_mm2
 
-def create_annotations_lipid(image, font = 'cluster', bin_size = 2):   
+def create_annotations_lipid(image, font = 'cluster', bin_size = 2, filename = 'unknown'):   
     """Obtain FCT and lipid arc measurements
 
     Args:
@@ -484,10 +484,22 @@ def create_annotations_lipid(image, font = 'cluster', bin_size = 2):
             C = []
             for nn in range(id2_lipid.shape[0]):
                 C.append((id1_lipid[n,0]-id2_lipid[nn,0])**2+(id1_lipid[n,1]-id2_lipid[nn,1])**2)
+            
+            try:
+                if len(C) == 0:  # Check if the list C is empty
+                    id1_argmin[n] = -1  # or any default value you want for argmin
+                    id1_min[n] = -99  # Set a default value for the minimum
+                    # Returning default values if C is empty
+                    return np.zeros((im_insize, im_insize), np.uint8), -99, -99, -99, lipid_ids
+                else:
+                    id1_argmin[n] = np.argmin(C)
+                    id1_min[n] = C[id1_argmin[n]]
+            except Exception as e:
+                print(f"Error in file: {filename}, Error message: {e}")
+                # Returning default values if an error occurs
+                return np.zeros((im_insize, im_insize), np.uint8), -99, -99, -99, lipid_ids
 
-            id1_argmin[n] = np.argmin(C)
-            id1_min[n] = C[id1_argmin[n]]
-        
+
         contours3[contours3==0]=contours[contours3==0]
 
         id1m = np.argmin(id1_min)
@@ -564,7 +576,7 @@ def create_annotations_lipid(image, font = 'cluster', bin_size = 2):
     return output_image, thickness_bin, cap_thickness, lipid_arc, lipid_ids
 
 
-def create_annotations_calcium(image, font = 'cluster', bin_size = 2):    
+def create_annotations_calcium(image, font = 'cluster', bin_size = 2, filename = 'unknown'):    
     """Obtain calcium arc, depth and thickness measurements
 
     Args:
@@ -820,8 +832,10 @@ def create_annotations_calcium(image, font = 'cluster', bin_size = 2):
                     if distance < min_dist:
                         min_dist = distance
                         thickness = distance
-
-            id2_region = id2
+            if id2.size == 0:
+                print(f"Warning: Both id2_region and id2 are empty, skipping distance computation in file {filename}")
+            else:
+                id2_region = id2
 
         if id1_region.size==0:
 
@@ -845,33 +859,63 @@ def create_annotations_calcium(image, font = 'cluster', bin_size = 2):
             C = []
             for nn in range(id2_region.shape[0]):
                 C.append((id1_region[n,0]-id2_region[nn,0])**2+(id1_region[n,1]-id2_region[nn,1])**2)
+            try:
+                if len(C) == 0:  # Check if the list C is empty
+                    id1_argmin[n] = -1  # or any default value you want for argmin
+                    id1_min[n] = -99  # Set a default value for the minimum
+                    # Returning default values if C is empty
+                    return np.zeros((im_insize, im_insize), np.uint8), thickness_bin, -99, -99, -99, ids
+                else:
+                    id1_argmin[n] = np.argmin(C)
+                    id1_min[n] = C[id1_argmin[n]]
+            except Exception as e:
+                print(f"Error in file: {filename}, Error message: {e}")
+                # Returning default values if an error occurs
+                return np.zeros((im_insize, im_insize), np.uint8), thickness_bin, -99, -99, -99, ids
 
-            id1_argmin[n] = np.argmin(C)
-            id1_min[n] = C[id1_argmin[n]]
         
         contours3[contours3==0]=contours[contours3==0]
 
-        id1m = np.argmin(id1_min)
-        id2m = id1_argmin[id1m]
+        if id1_min.size == 0:
+            print(f"Error: id1_min is empty before calling np.argmin in file {filename}")
+            id1m = -1  # Assign a default value to prevent crashing
+        else:
+            id1m = np.argmin(id1_min)
+
+        if id1m == -1:
+            print(f"Skipping id2m computation due to empty id1_min, in file {filename}")
+            id2m = -1  # Prevent further errors
+        else:
+            id2m = id1_argmin[id1m]
 
         conv_fact = 1
 
         id1_min = np.sqrt(id1_min)*1000/conv_fact
-        thickness = id1_min[id1m]/100
+        if id1_min.size == 0:
+            print(f"Error: id1_min is empty before calling np.argmin in file {filename}")
+            id1m = -1
+            thickness = np.nan  # Use NaN as a placeholder
+        else:
+            id1m = np.argmin(id1_min)
+            thickness = id1_min[id1m] / 100  # Compute only if valid
         
-        thin_x = id1_region[id1m,1]
-        thin_y = id1_region[id1m,0]
-        thin_x2 = id2_region[id2m,1]
-        thin_y2 = id2_region[id2m,0]
+        if id1m == -1 or id2m == -1:
+            print(f"Skipping thin_x/thin_y calculation due to invalid index, in file {filename}")
+            thin_x = thin_y = thin_x2 = thin_y2 = None  # Or set default values
+        else:
+            thin_x = id1_region[id1m,1]
+            thin_y = id1_region[id1m,0]
+            thin_x2 = id2_region[id2m,1]
+            thin_y2 = id2_region[id2m,0]
         
         # thickness per lipid/calcium bin
         thickness_bin = np.zeros(region_bins.shape[0]-1)                
-        for n in range(thickness_bin.shape[0]-1):
-            try:
-                thickness_bin[n] = np.min(id1_min[angle_bin1[thin_id1]==(n+1)])
-            except (ValueError, TypeError):
-                if hist_count_guide[n]>0:
-                    thickness_bin[n] = -1
+        for n in range(thickness_bin.shape[0]):  # Remove -1 to ensure full iteration
+            mask = angle_bin1[thin_id1] == (n + 1)  # Create a mask for valid indices
+            if np.any(mask):  # Check if the mask selects at least one element
+                thickness_bin[n] = np.min(id1_min[mask])  # Compute minimum safely
+            elif hist_count_guide[n] > 0:  # If there's relevant data but no valid min
+                thickness_bin[n] = -1  # Assign a placeholder value
 
         
         # Pil manipulations
@@ -895,7 +939,7 @@ def create_annotations_calcium(image, font = 'cluster', bin_size = 2):
         img1.ellipse([(max_value[0][1]-dotsize,max_value[0][0]-dotsize),(max_value[0][1]+dotsize,max_value[0][0]+dotsize)], fill = 13, width = 0) 
         img1.ellipse([(max_value[1][1]-dotsize,max_value[1][0]-dotsize),(max_value[1][1]+dotsize,max_value[1][0]+dotsize)], fill = 13, width = 0) 
 
-
+        
         if not np.isnan(thickness):
             img1.line([(thin_x,thin_y),(thin_x2,thin_y2)], fill = 13, width = 3)
             dotsize=3
