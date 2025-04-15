@@ -6,7 +6,7 @@ setup(
     packages=find_packages(),
     install_requires=[],
     entry_points={'console_scripts': [
-        'nnUNet_predict = nnunet.inference.predict:predict_entry_point',
+        'nnUNet_predict = nnunetv2.inference.predict_from_raw_data:predict_entry_point',
         ],
     }
 )
